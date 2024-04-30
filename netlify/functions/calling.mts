@@ -1,15 +1,16 @@
 import type { HandlerEvent, HandlerContext, Handler } from "@netlify/functions";
 import axios from "axios";
-
+import cookie from "cookie";
 interface Body {
   account_id: string;
   token: string;
 }
-const BASE_URL = "http://localhost:8888";
 export const handler: Handler = async (
   event: HandlerEvent,
   context: HandlerContext
 ) => {
+  console.log("calling");
+
   if (event.httpMethod !== "POST") {
     return {
       body: JSON.stringify({ message: "Not Implemented" }),
@@ -22,7 +23,6 @@ export const handler: Handler = async (
       statusCode: 400,
     };
   }
-
   try {
     let body: Body = JSON.parse(event.body);
 
@@ -33,11 +33,26 @@ export const handler: Handler = async (
       };
     }
 
-    const response = await axios.post(`${BASE_URL}/api/calling`, body);
-    console.log(response.data);
-
+    const hour = 3600000;
+    const twoWeeks = 14 * 24 * hour;
+    const Cookie1 = cookie.serialize("account_id", body.account_id, {
+      httpOnly: true,
+      path: "/",
+      maxAge: twoWeeks,
+      sameSite: "none",
+    });
+    const Cookie2 = cookie.serialize("token", body.token, {
+      // secure: true,
+      httpOnly: true,
+      path: "/",
+      maxAge: twoWeeks,
+      sameSite: "none",
+    });
     return {
-      body: JSON.stringify({ message: "Sucess" }),
+      body: JSON.stringify({ message: "Cookie set" }),
+      multiValueHeaders: {
+        "Set-Cookie": [Cookie1, Cookie2],
+      },
       statusCode: 200,
     };
   } catch (error) {
