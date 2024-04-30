@@ -5,7 +5,7 @@ interface Body {
   account_id: string;
   token: string;
 }
-const BASE_URL = "http://localhost:8888";
+const BASE_URL = "https://6630bffa8307360008152cb6--bejewelled-raindrop-24f246.netlify.app/";
 export const handler: Handler = async (
   event: HandlerEvent,
   context: HandlerContext
